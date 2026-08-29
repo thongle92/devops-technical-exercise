@@ -1,0 +1,50 @@
+{
+    "status": "success",
+    "data": {
+        "groups": [
+            {
+                "name": "greeter",
+                "file": "/etc/prometheus/rules/alerts.yml",
+                "rules": [
+                    {
+                        "state": "firing",
+                        "name": "GreeterHighErrorRate",
+                        "query": "sum(rate(greeter_http_requests_total{status=\"500\"}[1m])) > 0",
+                        "duration": 60,
+                        "keepFiringFor": 0,
+                        "labels": {
+                            "severity": "page"
+                        },
+                        "annotations": {
+                            "description": "{{ $value | humanize }} req/s of 5xx responses from greeter over the last minute.",
+                            "summary": "Greeter is returning 5xx errors"
+                        },
+                        "alerts": [
+                            {
+                                "labels": {
+                                    "alertname": "GreeterHighErrorRate",
+                                    "severity": "page"
+                                },
+                                "annotations": {
+                                    "description": "288.9m req/s of 5xx responses from greeter over the last minute.",
+                                    "summary": "Greeter is returning 5xx errors"
+                                },
+                                "state": "firing",
+                                "activeAt": "2026-08-29T11:07:00.470150905Z",
+                                "value": "2.8888246927846045e-01"
+                            }
+                        ],
+                        "health": "ok",
+                        "evaluationTime": 0.001232208,
+                        "lastEvaluation": "2026-08-29T11:08:45.469058713Z",
+                        "type": "alerting"
+                    }
+                ],
+                "interval": 15,
+                "limit": 0,
+                "evaluationTime": 0.001486333,
+                "lastEvaluation": "2026-08-29T11:08:45.468848963Z"
+            }
+        ]
+    }
+}

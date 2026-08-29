@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: default
+spec:
+  # ClusterIP - use `kubectl port-forward svc/prometheus 9090:9090` to view
+  # the UI. Avoids needing another NodePort (which would require recreating
+  # the kind cluster to add the port mapping).
+  type: ClusterIP
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: http
