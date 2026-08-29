@@ -68,7 +68,7 @@ jobs:
         # the public ruleset with no Semgrep account/token needed.
         run: |
           pip install semgrep
-          semgrep scan --config=auto app
+          semgrep scan --config=auto
 
       - name: SonarQube
         # Needs a SonarQube server (self-hosted or SonarCloud) - not
