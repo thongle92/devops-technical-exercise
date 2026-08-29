@@ -125,6 +125,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: docker/setup-buildx-action@v4 # needed for the gha cache backend below
+
       - name: Docker build
         uses: docker/build-push-action@v7
         with:
@@ -132,6 +134,8 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/greeter:${{ github.sha }}
           push: false
           load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Trivy Docker image scan
         uses: aquasecurity/trivy-action@0.35.0
@@ -152,6 +156,7 @@ jobs:
           context: app
           tags: ghcr.io/${{ github.repository }}/greeter:${{ github.sha }}
           push: true
+          cache-from: type=gha
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
