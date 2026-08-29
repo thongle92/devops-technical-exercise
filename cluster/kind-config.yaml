@@ -1,0 +1,11 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: greeter
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # Must match the NodePort used by the greeter Service (Task 3).
+      - containerPort: 30080
+        hostPort: 8080
+  - role: worker
+  - role: worker
