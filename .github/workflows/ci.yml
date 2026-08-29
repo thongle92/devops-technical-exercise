@@ -17,8 +17,7 @@ name: CI
 # itself had a supply chain compromise in March 2026, which is exactly the
 # failure mode SHA-pinning exists to prevent.
 
-on:
-  push:
+on: push
 
 permissions:
   contents: read
