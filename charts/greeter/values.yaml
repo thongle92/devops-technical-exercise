@@ -1,0 +1,57 @@
+deployment:
+  replicaCount: 2
+
+  image:
+    repository: greeter
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080 # keep in sync with PORT in `env` below
+
+  greetingName: "" # required, no default - app exits non-zero if unset
+
+  # keep in sync with SHUTDOWN_DELAY_SECONDS / DRAIN_TIMEOUT_SECONDS in `env`
+  shutdownDelaySeconds: 10
+  drainTimeoutSeconds: 20
+  terminationGraceMarginSeconds: 15 # buffer so k8s doesn't SIGKILL mid-drain
+
+  env:
+    - name: PORT
+      value: "8080"
+    - name: VERSION
+      value: "1.0.0"
+    - name: WARMUP_SECONDS
+      value: "30"
+    - name: SHUTDOWN_DELAY_SECONDS
+      value: "10"
+    - name: DRAIN_TIMEOUT_SECONDS
+      value: "20"
+
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+    periodSeconds: 10
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: http
+    periodSeconds: 2 # tight polling so unready is noticed within shutdownDelaySeconds
+    failureThreshold: 1
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+podDisruptionBudget:
+  minAvailable: 1

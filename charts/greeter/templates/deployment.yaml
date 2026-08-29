@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "greeter.fullname" . }}
+  labels:
+    {{- include "greeter.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "greeter.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "greeter.labels" . | nindent 8 }}
+    spec:
+      # spread replicas across nodes; "preferred" so it still schedules on a single node
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    {{- include "greeter.labels" . | nindent 20 }}
+      containers:
+        - name: greeter
+          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.containerPort }}
+          env:
+            - name: GREETING_NAME
+              value: {{ required "deployment.greetingName is required" .Values.deployment.greetingName | quote }}
+            {{- range .Values.deployment.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.deployment.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.deployment.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+      # must cover shutdownDelaySeconds + drainTimeoutSeconds in full
+      terminationGracePeriodSeconds: {{ add .Values.deployment.shutdownDelaySeconds .Values.deployment.drainTimeoutSeconds .Values.deployment.terminationGraceMarginSeconds }}

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: greeter
+description: what3words DevOps exercise service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
