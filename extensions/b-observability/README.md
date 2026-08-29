@@ -7,10 +7,10 @@ Task 3).
 ## Deploy
 
 ```sh
-kubectl apply -f observability/rbac.yaml \
-  -f observability/configmap.yaml \
-  -f observability/deployment.yaml \
-  -f observability/service.yaml \
+kubectl apply -f extensions/b-observability/rbac.yaml \
+  -f extensions/b-observability/configmap.yaml \
+  -f extensions/b-observability/deployment.yaml \
+  -f extensions/b-observability/service.yaml \
   --context kind-greeter
 ```
 
@@ -31,7 +31,7 @@ Then open http://localhost:9090.
 
 ## The alert
 
-`GreeterHighErrorRate` (`observability/configmap.yaml`, `alerts.yml`):
+`GreeterHighErrorRate` (`configmap.yaml`, `alerts.yml`):
 
 ```
 sum(rate(greeter_http_requests_total{status="500"}[1m])) > 0
@@ -54,7 +54,7 @@ Then check:
 curl -sS localhost:9090/api/v1/rules
 ```
 
-Evidence from an actual run is saved in `observability/evidence/`:
+Evidence from an actual run is saved in `evidence/`:
 - `targets.json` - all three `greeter` Pods (dev + prod) discovered and `up`.
 - `alert-firing.json` - `GreeterHighErrorRate` in `state: "firing"` after ~90s
   of sustained `/boom` traffic.
