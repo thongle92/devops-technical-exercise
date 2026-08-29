@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: greeter-gitops
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/thongle92/devops-technical-exercise.git
+    targetRevision: solution
+    path: charts/greeter
+    helm:
+      parameters:
+        - name: deployment.greetingName
+          value: "Thong (gitops)"
+        # ClusterIP, not the chart's default NodePort: nodePort 30080/30081
+        # are already claimed by the dev/prod Services Terraform manages -
+        # NodePort is cluster-scoped, so this would otherwise collide.
+        - name: service.type
+          value: ClusterIP
+  destination:
+    server: https://kubernetes.default.svc
+    # Deliberately its own namespace, separate from the dev/prod namespaces
+    # Terraform manages (Task 4) - Argo CD and Terraform must not both claim
+    # ownership of the same release. See DECISIONS.md.
+    namespace: gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

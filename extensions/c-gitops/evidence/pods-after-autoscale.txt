@@ -1,0 +1,4 @@
+NAME                                      READY   STATUS    RESTARTS   AGE   IP            NODE              NOMINATED NODE   READINESS GATES
+greeter-gitops-greeter-74985d9f78-8lwcj   1/1     Running   0          13m   10.244.3.9    greeter-worker2   <none>           <none>
+greeter-gitops-greeter-74985d9f78-qkhc4   1/1     Running   0          13m   10.244.2.9    greeter-worker    <none>           <none>
+greeter-gitops-greeter-74985d9f78-v76l8   1/1     Running   0          41s   10.244.3.10   greeter-worker2   <none>           <none>

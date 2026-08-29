@@ -1,0 +1,167 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"name":"greeter-gitops","namespace":"argocd"},"spec":{"destination":{"namespace":"gitops","server":"https://kubernetes.default.svc"},"project":"default","source":{"helm":{"parameters":[{"name":"deployment.greetingName","value":"Thong (gitops)"},{"name":"service.type","value":"ClusterIP"}]},"path":"charts/greeter","repoURL":"https://github.com/thongle92/devops-technical-exercise.git","targetRevision":"solution"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"syncOptions":["CreateNamespace=true"]}}}
+  creationTimestamp: "2026-08-29T14:54:05Z"
+  generation: 19
+  name: greeter-gitops
+  namespace: argocd
+  resourceVersion: "31051"
+  uid: 4c8d5a23-c689-4038-8a85-ab7728214b07
+spec:
+  destination:
+    namespace: gitops
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    helm:
+      parameters:
+      - name: deployment.greetingName
+        value: Thong (gitops)
+      - name: service.type
+        value: ClusterIP
+    path: charts/greeter
+    repoURL: https://github.com/thongle92/devops-technical-exercise.git
+    targetRevision: solution
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+status:
+  controllerNamespace: argocd
+  health:
+    lastTransitionTime: "2026-08-29T14:59:20Z"
+    status: Healthy
+  history:
+  - deployStartedAt: "2026-08-29T14:54:05Z"
+    deployedAt: "2026-08-29T14:54:06Z"
+    id: 0
+    initiatedBy:
+      automated: true
+    revision: 67075844c29205958ca08d4bc922cab1a8e55cde
+    source:
+      helm:
+        parameters:
+        - name: deployment.greetingName
+          value: Thong (gitops)
+        - name: service.type
+          value: ClusterIP
+      path: charts/greeter
+      repoURL: https://github.com/thongle92/devops-technical-exercise.git
+      targetRevision: solution
+  - deployStartedAt: "2026-08-29T14:58:48Z"
+    deployedAt: "2026-08-29T14:58:48Z"
+    id: 1
+    initiatedBy:
+      automated: true
+    revision: 4bc162f57588e3cc9335956a057677d36f21779a
+    source:
+      helm:
+        parameters:
+        - name: deployment.greetingName
+          value: Thong (gitops)
+        - name: service.type
+          value: ClusterIP
+      path: charts/greeter
+      repoURL: https://github.com/thongle92/devops-technical-exercise.git
+      targetRevision: solution
+  operationState:
+    finishedAt: "2026-08-29T14:58:48Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        automated: true
+      retry:
+        limit: 5
+      sync:
+        autoHealAttemptsCount: 1
+        prune: true
+        resources:
+        - group: apps
+          kind: Deployment
+          name: greeter-gitops-greeter
+        revision: 4bc162f57588e3cc9335956a057677d36f21779a
+        source:
+          helm:
+            parameters:
+            - name: deployment.greetingName
+              value: Thong (gitops)
+            - name: service.type
+              value: ClusterIP
+          path: charts/greeter
+          repoURL: https://github.com/thongle92/devops-technical-exercise.git
+          targetRevision: solution
+        syncOptions:
+        - CreateNamespace=true
+    phase: Succeeded
+    startedAt: "2026-08-29T14:58:48Z"
+    syncResult:
+      resources:
+      - group: apps
+        hookPhase: Running
+        images:
+        - greeter:1.0.0
+        kind: Deployment
+        message: deployment.apps/greeter-gitops-greeter unchanged
+        name: greeter-gitops-greeter
+        namespace: gitops
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: 4bc162f57588e3cc9335956a057677d36f21779a
+      source:
+        helm:
+          parameters:
+          - name: deployment.greetingName
+            value: Thong (gitops)
+          - name: service.type
+            value: ClusterIP
+        path: charts/greeter
+        repoURL: https://github.com/thongle92/devops-technical-exercise.git
+        targetRevision: solution
+  reconciledAt: "2026-08-29T14:58:48Z"
+  resourceHealthSource: appTree
+  resources:
+  - kind: Service
+    name: greeter-gitops-greeter
+    namespace: gitops
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: greeter-gitops-greeter
+    namespace: gitops
+    status: Synced
+    version: v1
+  - group: policy
+    kind: PodDisruptionBudget
+    name: greeter-gitops-greeter
+    namespace: gitops
+    status: Synced
+    version: v1
+  sourceHydrator: {}
+  sourceType: Helm
+  summary:
+    images:
+    - greeter:1.0.0
+  sync:
+    comparedTo:
+      destination:
+        namespace: gitops
+        server: https://kubernetes.default.svc
+      source:
+        helm:
+          parameters:
+          - name: deployment.greetingName
+            value: Thong (gitops)
+          - name: service.type
+            value: ClusterIP
+        path: charts/greeter
+        repoURL: https://github.com/thongle92/devops-technical-exercise.git
+        targetRevision: solution
+    revision: 4bc162f57588e3cc9335956a057677d36f21779a
+    status: Synced
