@@ -4,8 +4,11 @@ name: greeter
 nodes:
   - role: control-plane
     extraPortMappings:
-      # Must match the NodePort used by the greeter Service (Task 3).
+      # Must match the NodePorts used by the greeter Service in each
+      # Terraform environment (Task 4): dev=30080, prod=30081.
       - containerPort: 30080
         hostPort: 8080
+      - containerPort: 30081
+        hostPort: 8081
   - role: worker
   - role: worker

@@ -2,3 +2,6 @@
 app/greeter
 .DS_Store
 .idea/
+**/.terraform/
+*.tfstate
+*.tfstate.*
