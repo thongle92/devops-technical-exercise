@@ -3,12 +3,17 @@ name: CI
 # Scope: this pipeline is for the Go application only (the "service"), not
 # the Helm chart or Terraform in this repo - see DECISIONS.md.
 #
-# Several steps below need infrastructure/credentials that don't exist for
-# this exercise (SonarQube host, Semgrep App token, DefectDojo/Dependency-Track
-# instances, a Cosign-capable registry) - see DECISIONS.md for which ones are
-# real vs. which ones document intent for a production version of this
-# pipeline. Action versions are pinned to the latest verified major release
-# as of 2026-08-29; production should pin by commit SHA, not tag - trivy-action
+# SonarQube and the DefectDojo/Dependency-Track pushes need infrastructure
+# this exercise doesn't have (a SonarQube host, running DefectDojo/
+# Dependency-Track instances) - those steps are gated on their secrets being
+# set, so they skip cleanly instead of failing on a fresh clone/fork.
+# Everything else runs for real with zero extra accounts: gitleaks, semgrep
+# (public ruleset), Trivy, SBOM generation, the Docker build, pushing to
+# ghcr.io (uses the repo's own GITHUB_TOKEN), and Cosign keyless signing
+# (GitHub OIDC against public Sigstore infra). See DECISIONS.md.
+#
+# Action versions are pinned to the latest verified major release as of
+# 2026-08-29; production should pin by commit SHA, not tag - trivy-action
 # itself had a supply chain compromise in March 2026, which is exactly the
 # failure mode SHA-pinning exists to prevent.
 
@@ -46,13 +51,17 @@ jobs:
 
       - name: semgrep (SAST)
         # semgrep-action (the wrapper) is deprecated; run the CLI directly.
+        # `semgrep scan` (not `semgrep ci`) so this runs standalone against
+        # the public ruleset with no Semgrep account/token needed.
         run: |
           pip install semgrep
-          semgrep ci --config=auto
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+          semgrep scan --config=auto app
 
       - name: SonarQube
+        # Needs a SonarQube server (self-hosted or SonarCloud) - not
+        # available in this exercise. Skips instead of failing when the
+        # secret isn't set; see DECISIONS.md.
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         uses: sonarsource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -74,6 +83,9 @@ jobs:
           output-file: sbom.cyclonedx.json
 
       - name: Push scan results to DefectDojo
+        # Needs a running DefectDojo instance - not available in this
+        # exercise. Skips instead of failing when the secret isn't set.
+        if: ${{ secrets.DEFECTDOJO_API_KEY != '' }}
         run: |
           curl -sS -X POST "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
@@ -81,6 +93,9 @@ jobs:
             -F "file=@trivy-fs-results.sarif"
 
       - name: Push SBOM to Dependency-Track
+        # Needs a running Dependency-Track instance - not available in this
+        # exercise. Skips instead of failing when the secret isn't set.
+        if: ${{ secrets.DEPENDENCY_TRACK_API_KEY != '' }}
         run: |
           curl -sS -X POST "${{ secrets.DEPENDENCY_TRACK_URL }}/api/v1/bom" \
             -H "X-Api-Key: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}" \
