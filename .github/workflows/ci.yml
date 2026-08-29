@@ -28,6 +28,14 @@ jobs:
     defaults:
       run:
         working-directory: app
+    # `if:` conditions can't reference `secrets.*` directly (GitHub Actions
+    # rejects it at parse time: "Unrecognized named-value: 'secrets'") -
+    # mirror the ones we need to gate on into `env` here instead, and check
+    # `env.*` in each step's `if:` below.
+    env:
+      SONAR_TOKEN_SET: ${{ secrets.SONAR_TOKEN != '' }}
+      DEFECTDOJO_API_KEY_SET: ${{ secrets.DEFECTDOJO_API_KEY != '' }}
+      DEPENDENCY_TRACK_API_KEY_SET: ${{ secrets.DEPENDENCY_TRACK_API_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -60,7 +68,7 @@ jobs:
         # Needs a SonarQube server (self-hosted or SonarCloud) - not
         # available in this exercise. Skips instead of failing when the
         # secret isn't set; see DECISIONS.md.
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ env.SONAR_TOKEN_SET == 'true' }}
         uses: sonarsource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -84,7 +92,7 @@ jobs:
       - name: Push scan results to DefectDojo
         # Needs a running DefectDojo instance - not available in this
         # exercise. Skips instead of failing when the secret isn't set.
-        if: ${{ secrets.DEFECTDOJO_API_KEY != '' }}
+        if: ${{ env.DEFECTDOJO_API_KEY_SET == 'true' }}
         run: |
           curl -sS -X POST "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
@@ -94,7 +102,7 @@ jobs:
       - name: Push SBOM to Dependency-Track
         # Needs a running Dependency-Track instance - not available in this
         # exercise. Skips instead of failing when the secret isn't set.
-        if: ${{ secrets.DEPENDENCY_TRACK_API_KEY != '' }}
+        if: ${{ env.DEPENDENCY_TRACK_API_KEY_SET == 'true' }}
         run: |
           curl -sS -X POST "${{ secrets.DEPENDENCY_TRACK_URL }}/api/v1/bom" \
             -H "X-Api-Key: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}" \
