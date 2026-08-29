@@ -1,5 +1,5 @@
 deployment:
-  replicaCount: 2
+  replicaCount: 3
 
   image:
     repository: greeter
