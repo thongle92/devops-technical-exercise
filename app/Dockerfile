@@ -9,3 +9,4 @@ FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=builder /greeter /greeter
 EXPOSE 8080
 ENTRYPOINT ["/greeter"]
+
